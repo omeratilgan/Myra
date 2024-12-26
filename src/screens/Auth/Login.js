@@ -1,44 +1,52 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, Image } from 'react-native';
+import { IMAGES } from '../../utils/constants.js'; // constants.js'den IMAGES'ı import et
 
 const Login = ({ navigation }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [isPasswordVisible, setPasswordVisible] = useState(false);
 
     const handleLogin = () => {
-        // Basit validasyon
         if (!email || !password) {
             Alert.alert('Hata', 'Lütfen tüm alanları doldurun');
             return;
         }
-
-        // Giriş isteği simülasyonu
-        console.log('Giriş Bilgileri:', { email, password });
-        // Backend API isteği buraya yapılacak
         Alert.alert('Başarılı', 'Giriş başarılı!');
-
-        // Örnek: Home ekranına yönlendirme
         navigation.navigate('Home');
     };
 
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Giriş Yap</Text>
+            <Text style={styles.label}>Email</Text>
+            <View style={styles.inputContainer}>
             <TextInput
-                style={styles.input}
+                style={styles.inputField}
                 placeholder="Email"
                 keyboardType="email-address"
                 autoCapitalize="none"
                 value={email}
                 onChangeText={setEmail}
             />
-            <TextInput
-                style={styles.input}
-                placeholder="Şifre"
-                secureTextEntry
-                value={password}
-                onChangeText={setPassword}
-            />
+            </View>
+        
+            <Text style={styles.label}>Şifre</Text>
+            <View style={styles.inputContainer}>
+                <TextInput
+                    style={styles.inputField}
+                    placeholder="Şifre"
+                    secureTextEntry={!isPasswordVisible}
+                    value={password}
+                    onChangeText={setPassword}
+                />
+                <TouchableOpacity onPress={() => setPasswordVisible(!isPasswordVisible)}>
+                    <Image
+                        source={isPasswordVisible ? IMAGES.EYE_OFF : IMAGES.EYE} // Duruma göre görsel seç
+                        style={styles.icon}
+                    />
+                </TouchableOpacity>
+            </View>
             <TouchableOpacity style={styles.button} onPress={handleLogin}>
                 <Text style={styles.buttonText}>Giriş Yap</Text>
             </TouchableOpacity>
@@ -63,14 +71,31 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         color: '#333',
     },
-    input: {
-        height: 50,
+    label: {
+        fontSize: 16,
+        fontWeight: '600',
+        marginBottom: 5,
+        color: '#000',
+    },
+    inputContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
         borderColor: '#ccc',
         borderWidth: 1,
         borderRadius: 8,
         marginBottom: 15,
         paddingHorizontal: 10,
         backgroundColor: '#fff',
+    },
+    inputField: {
+        flex: 1,
+        height: 50,
+        color: '#000',
+    },
+    icon: {
+        width: 20,
+        height: 20,
+        marginLeft: 10,
     },
     button: {
         height: 50,
