@@ -1,20 +1,46 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, Image } from 'react-native';
 import { IMAGES } from '../../utils/constants.js'; // constants.js'den IMAGES'ı import et
+import Button from '../../components/common/Button.js';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Login = ({ navigation }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isPasswordVisible, setPasswordVisible] = useState(false);
 
-    const handleLogin = () => {
-        if (!email || !password) {
-            Alert.alert('Hata', 'Lütfen tüm alanları doldurun');
-            return;
+
+    // Giriş işlemi sonrasında
+const handleLogin = async () => {
+    if (!email || !password) {
+        Alert.alert('Hata', 'Lütfen tüm alanları doldurun');
+        return;
+    }
+
+    try {
+        const response = await fetch('http://localhost:3000/auth/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, password }),
+        });
+
+        const data = await response.json();
+        
+        if (data.token) {
+            // Token'ı AsyncStorage'a kaydet
+            await AsyncStorage.setItem('authToken', data.token);
+            Alert.alert('Başarılı', 'Giriş başarılı!');
+            navigation.navigate('Home');
+        } else {
+            Alert.alert('Hata', 'Giriş yapılamadı');
         }
-        Alert.alert('Başarılı', 'Giriş başarılı!');
-        navigation.navigate('Home');
-    };
+    } catch (error) {
+        console.error('Login Error:', error);
+    }
+};
 
     return (
         <View style={styles.container}>
@@ -42,14 +68,12 @@ const Login = ({ navigation }) => {
                 />
                 <TouchableOpacity onPress={() => setPasswordVisible(!isPasswordVisible)}>
                     <Image
-                        source={isPasswordVisible ? IMAGES.EYE_OFF : IMAGES.EYE} // Duruma göre görsel seç
+                        source={isPasswordVisible ? IMAGES.EYE : IMAGES.EYE_OFF} // Duruma göre görsel seç
                         style={styles.icon}
                     />
                 </TouchableOpacity>
             </View>
-            <TouchableOpacity style={styles.button} onPress={handleLogin}>
-                <Text style={styles.buttonText}>Giriş Yap</Text>
-            </TouchableOpacity>
+            <Button title="Giriş Yap" onPress={handleLogin} />
             <TouchableOpacity onPress={() => navigation.navigate('Register')}>
                 <Text style={styles.linkText}>Hesabın yok mu? Kayıt Ol</Text>
             </TouchableOpacity>
@@ -96,18 +120,6 @@ const styles = StyleSheet.create({
         width: 20,
         height: 20,
         marginLeft: 10,
-    },
-    button: {
-        height: 50,
-        backgroundColor: '#007BFF',
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderRadius: 8,
-    },
-    buttonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold',
     },
     linkText: {
         color: '#007BFF',
