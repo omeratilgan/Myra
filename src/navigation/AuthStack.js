@@ -9,7 +9,6 @@ const AuthStack = () => {
     return (
         <Stack.Navigator>
             <Stack.Screen name="Login" component={Login} />
-            <Stack.Screen name="Register" component={Register} />
         </Stack.Navigator>
     );
 };

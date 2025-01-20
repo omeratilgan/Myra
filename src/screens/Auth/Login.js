@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, Image } from 'react-native';
-import { IMAGES } from '../../utils/constants.js'; // constants.js'den IMAGES'ı import et
+import { View, Text, StyleSheet, TouchableOpacity, Alert, Image } from 'react-native';
+import { IMAGES } from '../../utils/constants.js';
 import Button from '../../components/common/Button.js';
-import axios from 'axios';
+import Input from '../../components/common/Input.js';
+import api from '../../api/apiConfig';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Login = ({ navigation }) => {
@@ -12,55 +13,53 @@ const Login = ({ navigation }) => {
 
 
     // Giriş işlemi sonrasında
-const handleLogin = async () => {
-    if (!email || !password) {
-        Alert.alert('Hata', 'Lütfen tüm alanları doldurun');
-        return;
-    }
-
-    try {
-        const response = await fetch('http://localhost:3000/auth/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email, password }),
-        });
-
-        const data = await response.json();
-        
-        if (data.token) {
-            // Token'ı AsyncStorage'a kaydet
-            await AsyncStorage.setItem('authToken', data.token);
-            Alert.alert('Başarılı', 'Giriş başarılı!');
-            navigation.navigate('Home');
-        } else {
-            Alert.alert('Hata', 'Giriş yapılamadı');
+    const handleLogin = async () => {
+        if (!email || !password) {
+            Alert.alert('Hata', 'Lütfen tüm alanları doldurun');
+            return;
         }
-    } catch (error) {
-        console.error('Login Error:', error);
-    }
-};
+
+        try {
+            const response = await api.post('/auth/login', {
+                email,
+                password
+            });
+
+            if (response.data.token) {
+                await AsyncStorage.setItem('authToken', response.data.token);
+                Alert.alert('Başarılı', 'Giriş başarılı!');
+                navigation.navigate('Home');
+            }
+        } catch (error) {
+            let errorMessage = 'Giriş yapılamadı';
+            
+            if (error.response) {
+                // Sunucudan gelen hata mesajını kullan
+                errorMessage = error.response.data.message || errorMessage;
+            }
+            
+            Alert.alert('Hata', errorMessage);
+            console.error('Login Error:', error);
+        }
+    };
 
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Giriş Yap</Text>
             <Text style={styles.label}>Email</Text>
             <View style={styles.inputContainer}>
-            <TextInput
-                style={styles.inputField}
+            <Input
                 placeholder="Email"
-                keyboardType="email-address"
-                autoCapitalize="none"
                 value={email}
                 onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
             />
             </View>
         
             <Text style={styles.label}>Şifre</Text>
             <View style={styles.inputContainer}>
-                <TextInput
-                    style={styles.inputField}
+                <Input
                     placeholder="Şifre"
                     secureTextEntry={!isPasswordVisible}
                     value={password}
@@ -110,11 +109,6 @@ const styles = StyleSheet.create({
         marginBottom: 15,
         paddingHorizontal: 10,
         backgroundColor: '#fff',
-    },
-    inputField: {
-        flex: 1,
-        height: 50,
-        color: '#000',
     },
     icon: {
         width: 20,
