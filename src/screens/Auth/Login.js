@@ -18,28 +18,39 @@ const Login = ({ navigation }) => {
             Alert.alert('Hata', 'Lütfen tüm alanları doldurun');
             return;
         }
-
+    
         try {
+            console.log('Login isteği başlatılıyor...', { email });
+            
             const response = await api.post('/auth/login', {
                 email,
                 password
             });
-
+    
+            console.log('Login yanıtı:', response.data);
+    
             if (response.data.token) {
                 await AsyncStorage.setItem('authToken', response.data.token);
                 Alert.alert('Başarılı', 'Giriş başarılı!');
-                navigation.navigate('Home');
+                navigation.replace('Home');
             }
         } catch (error) {
-            let errorMessage = 'Giriş yapılamadı';
+            console.error('Login Error Details:', {
+                message: error.message,
+                name: error.name,
+                code: error.code,
+                stack: error.stack,
+                config: error.config,
+                response: error.response
+            });
+    
+            let errorMessage = 'Bağlantı hatası oluştu. Lütfen internet bağlantınızı kontrol edin.';
             
             if (error.response) {
-                // Sunucudan gelen hata mesajını kullan
-                errorMessage = error.response.data.message || errorMessage;
+                errorMessage = error.response.data.message || 'Giriş başarısız';
             }
             
             Alert.alert('Hata', errorMessage);
-            console.error('Login Error:', error);
         }
     };
 

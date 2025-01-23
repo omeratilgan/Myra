@@ -1,50 +1,36 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
+
+const baseURL = Platform.OS === 'android' 
+    ? 'http://192.168.1.138:3000'  // Kendi local IP adresinizi yazın
+    //? 'http://10.0.2.2:3000'  // Android Emulator için
+    : 'http://localhost:3000'; // iOS için
 
 const api = axios.create({
-    baseURL: 'http://localhost:3000',
-    timeout: 5000,
+    baseURL,
+    timeout: 10000, // Timeout süresini artırdık
     headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json'
     }
 });
 
-// Request interceptor - her istekte token kontrolü
-api.interceptors.request.use(
-    async (config) => {
-        const token = await AsyncStorage.getItem('authToken');
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
-        }
-        return config;
-    },
-    (error) => {
-        return Promise.reject(error);
-    }
-);
+console.log('API Base URL:', baseURL); // Debug için URL'i loglayalım
 
-// Response interceptor - hata yönetimi
+// Debug için request ve response logları
+api.interceptors.request.use(request => {
+    console.log('API Request:', request);
+    return request;
+});
+
 api.interceptors.response.use(
-    (response) => response,
-    (error) => {
-        if (error.response) {
-            // Server kaynaklı hatalar
-            switch (error.response.status) {
-                case 401:
-                    // Token geçersiz veya expire olmuş
-                    AsyncStorage.removeItem('authToken');
-                    // Kullanıcıyı login sayfasına yönlendir
-                    break;
-                case 404:
-                    console.error('Kaynak bulunamadı');
-                    break;
-                case 500:
-                    console.error('Sunucu hatası');
-                    break;
-                default:
-                    console.error('Bir hata oluştu');
-            }
-        }
+    response => {
+        console.log('API Response:', response);
+        return response;
+    },
+    error => {
+        console.log('API Error:', error);
         return Promise.reject(error);
     }
 );
