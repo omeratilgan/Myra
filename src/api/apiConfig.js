@@ -3,8 +3,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 
 // Bilgisayarınızın yerel IP adresi
-const baseURL = 'http://192.168.1.144:3000'; // Ev
-// const baseURL = 'http://192.168.1.138:3000'; // Ofis
+const baseURL = 'http://192.168.1.114:3000/api'; // Ev
+// const baseURL = 'http://192.168.1.138:3000/api'; // Ofis
 
 const api = axios.create({
     baseURL,
