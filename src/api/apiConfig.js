@@ -15,7 +15,7 @@ const api = axios.create({
     }
 });
 
-// Debug için request ve response logları
+// Debug için request interceptor
 api.interceptors.request.use(request => {
     console.log('API Request:', {
         url: request.url,
@@ -34,7 +34,8 @@ api.interceptors.response.use(
     error => {
         console.log('API Error:', {
             message: error.message,
-            response: error.response?.data
+            response: error.response?.data,
+            config: error.config
         });
         return Promise.reject(error);
     }
