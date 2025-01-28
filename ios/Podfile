@@ -17,6 +17,10 @@ end
 target 'Myra' do
   config = use_native_modules!
 
+  pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
+
+  # Vector Icons -> bunu kullanmak için macosta build almadan önce cd ios dedikten sonra pod install yapıyoruz
+
   use_react_native!(
     :path => config[:reactNativePath],
     # An absolute path to your application root.

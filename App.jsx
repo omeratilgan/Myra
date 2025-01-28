@@ -1,13 +1,16 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import AuthStack from './src/navigation/AuthStack';
+import { ProductProvider } from './src/context/ProductContext';
+import RootNavigator from './src/navigation/RootNavigator';
 
 const App = () => {
-  return (
-    <NavigationContainer>
-      <AuthStack />
-    </NavigationContainer>
-  );
+    return (
+        <ProductProvider>
+            <NavigationContainer>
+                <RootNavigator />
+            </NavigationContainer>
+        </ProductProvider>
+    );
 };
 
 export default App;
