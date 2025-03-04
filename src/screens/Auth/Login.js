@@ -83,9 +83,13 @@ const Login = ({ navigation }) => {
                     />
                 </TouchableOpacity>
             </View>
-            <Button title="Giriş Yap" onPress={handleLogin} />
+            <Button title="Giriş Yap" onPress={() => navigation.replace('Main')} />
+            {/*<Button title="Giriş Yap" onPress={handleLogin} />*/}
             <TouchableOpacity onPress={() => navigation.navigate('Register')}>
                 <Text style={styles.linkText}>Hesabın yok mu? Kayıt Ol</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
+                <Text style={styles.linkText}>Şifremi unuttum</Text>
             </TouchableOpacity>
         </View>
     );
